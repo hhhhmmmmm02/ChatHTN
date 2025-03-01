@@ -7,6 +7,7 @@ ChatHTN: author Hector Munoz-Avila
 
 
 compilation order: DOMAINDefinitions, pyhop, openAINewVersion, DOMAIN
+
 For example:
 
 compilation order: logisticsDefinitions, pyhop, openAINewVersion, logistics
