@@ -12,7 +12,7 @@ For example:
 
 compilation order: logisticsDefinitions, pyhop, openAINewVersion, logistics
 
-To test comment out one of the definitions of the methods in the <domain> file. For instance, comment out the airplaneTransport methods in the logistics module:
+To test comment out one of the definitions of the methods in the DOMAIN file. For instance, comment out the airplaneTransport methods in the logistics module:
 
 
 pyhop.declare_methods('truckTransport', truckTransportMethod1, truckTransportMethod2, truckTransportMethod3) 
