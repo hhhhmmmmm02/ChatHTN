@@ -114,9 +114,9 @@ import copy
 import inspect
 
 ##### Unselect one of the following depending on the domain
-### from logisticsDefinitions import *
+from logisticsDefinitions import *
 ###from houseHoldRobotDefinitions import *
-from searchANDrescueDefinitions import *
+###from searchANDrescueDefinitions import *
 
 
 
