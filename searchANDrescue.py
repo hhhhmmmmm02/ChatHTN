@@ -74,14 +74,14 @@ pyhop.declare_operators(fly,scanArea,pickUpSurvivor,dropSurvivor,doNothing,verif
 print('')
 pyhop.print_operators()
 
-pyhop.declare_methods('rescueSurvivor',   rescueSurvivorM1, rescueSurvivorM2) #rescueSurvivorM1:  NO; , rescueSurvivorM2: NO; 0methods: NO
-pyhop.declare_methods('checkSurvivors',   checkSurvivorsM1,checkSurvivorsM2) # checkSurvivorsM1:  YES (0) checkSurvivorsM2:NO  (1) 0methods: YES(1)
+pyhop.declare_methods('rescueSurvivor',   rescueSurvivorM1, rescueSurvivorM2) #rescueSurvivorM1:  YES:(2); , rescueSurvivorM2: YES:(1); 0methods: YES:(2)
+pyhop.declare_methods('checkSurvivors',   checkSurvivorsM1,   checkSurvivorsM2) # checkSurvivorsM1:  YES:(0) checkSurvivorsM2:YES(1) 0methods: YES(1)
 pyhop.declare_methods('scanAreaTask',  scanAreaTaskM1,scanAreaTaskM2,scanAreaTaskM3) # scanAreaTaskM1: YES (0) scanAreaTaskM2:  YES (0) scanAreaTaskM3: YES (1); 0methods: YES(1)
-pyhop.declare_methods('searchANDrescue',  searchANDrescueM1,searchANDrescueM2,searchANDrescueM3) #searchANDrescueM1: NO; searchANDrescueM2: YES (0); searchANDrescueM3:NO  (0); 0methods:NO
+pyhop.declare_methods('searchANDrescue',searchANDrescueM1,searchANDrescueM2,searchANDrescueM3) #searchANDrescueM1: YES:(1); searchANDrescueM2: YES (0); searchANDrescueM3:YES  (1); 0methods: YES(1,1)
 
 
 
-## No solution: make 'forest':'storm' ##### NO
+## No solution: make 'forest':'storm' ##### NO (4)
 
 
 print('')

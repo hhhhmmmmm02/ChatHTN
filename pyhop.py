@@ -3,9 +3,10 @@
 from __future__ import print_function
 import copy,sys, pprint
 
+queriesChatGPT= 0
 
 ### compilation order: <domain>Definitions, pyhop, openAINewVersion, <domain>
-### comment/uncomment in Line 110 (approx.), depending on domain
+### comment/uncomment in Line 116 (approx.), depending on domain
 
 """  ChatHTN: author Hector Munoz-Avila
     This code is built on top of pyhop and therefore it is released under the  Apache License, Version 2.0 
@@ -346,8 +347,13 @@ def pyhop(skipHALT,state,tasks,verbose):
     ### if (task1,state) is in stack then there is an infinite loop!
     ### the first parameter is the stack
 
+    ### print('- added counter for number of queriesChatGPT' ) ## this is a global variable to count even when seek_plan backtracks
+    global queriesChatGPT 
+
     result = seek_plan([],skipHALT,state,tasks,[],0,verbose)
-    if verbose>0: print('** result =',result,'\n')
+    if verbose>0: 
+        print('** RESULT =',result,'\n')
+        print("queriesChatGPT: ",queriesChatGPT)
     return result
 
 def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
@@ -357,10 +363,12 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
     - depth is the recursion depth, for use in debugging
     - verbose is whether to print debugging messages
     """
+    global queriesChatGPT
+
     if verbose>1: print('depth {} tasks {}'.format(depth,tasks))
     if tasks == []:
         if verbose>2: print('depth {} returns plan {}'.format(depth,plan))
-        return plan
+        return plan 
     task1 = tasks[0]
     if verbose>1: 
         print("next task:", task1)
@@ -377,10 +385,10 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
     
     if task1[0] in operators:
         if task1[0].startswith("verify_"):
-            if plan and plan[-1] == task1:
-                solution = seek_plan(theStack,skipHALT,state,tasks[1:],plan,depth+1,verbose)
+            if plan and plan[-1] == task1: ## repeated verify_ task; so skip it
+                solution  = seek_plan(theStack,skipHALT,state,tasks[1:],plan,depth+1,verbose)
                 if solution != False:
-                    return solution
+                    return solution 
                 else:
                     return False
             
@@ -396,7 +404,7 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
         if len(task1[1:]) != num_params:
             print("error number of parameters Task1 name: ", task1[0],"< operator:", operator, "complete task: ", task1, " no plan can be generated")
             ##print(f"Error: {operator.__name__} takes {num_params} positional arguments but {len(*task1[1:])} were given")
-            return False
+            return False 
         
         ### need to check if arguments are tru objects 
 
@@ -407,11 +415,15 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
         if newstate:
             ## keeping track of all (task,state) visited in a stack
             theStack.insert(0,(task1,state.at))
-            solution = seek_plan(theStack,skipHALT,newstate,tasks[1:],plan+[task1],depth+1,verbose)
+            solution  = seek_plan(theStack,skipHALT,newstate,tasks[1:],plan+[task1],depth+1,verbose)
             if solution != False:
-                return solution
+                return solution 
             else:
-                return False
+                return False 
+            
+        if verbose>2: print('depth {} returns failure'.format(depth))
+        return False
+
     if task1[0] in methods:
         if verbose>1: 
             print(" nonprimitive")
@@ -424,7 +436,7 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
         num_params = len(sig.parameters) - 2 ## minus state and checkArguments
         if len(task1[1:]) != num_params:
             print(task1, " has incorrect number of arguments")
-            return False
+            return False 
         if not taskDefinition(state,*task1[1:],True): ### checks that arguments are true objects
             return False
         
@@ -439,16 +451,16 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
                 if tasks[-1] != verify_task:
                     subtasks.append(verify_task)
                 theStack.insert(0,(task1,state.at))
-                solution = seek_plan(theStack,skipHALT,state,subtasks+tasks[1:],plan,depth+1,verbose)
+                solution  = seek_plan(theStack,skipHALT,state,subtasks+tasks[1:],plan,depth+1,verbose)
                 if solution != False:
                     return solution
+    
+    
     #### If it reaches this point:
-    ###     task1[0] is primitive and no operators are appplicable, pr
     ###     task1[0] is compound and no methods are applicable
-    ###     by adding the code below, will avoid backtrackign to parent task
+    ###     by adding the code below, will avoid backtrackigng to parent task
     ###     NEW code starts here
 
-    if not task1[0] in operators:  
 
         taskDefinition = nonprimitiveTasks.get(task1[0],False)
         if taskDefinition == False: ###not a name of a task
@@ -463,7 +475,8 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
             return False
 
         chatGPTtasks = askChatGPT(state,task1,nonprimitiveTasks,skipHALT)
-        print("chatGPTtasks: ", chatGPTtasks)
+        queriesChatGPT = queriesChatGPT + 1
+        print("chatGPTtasks: ", chatGPTtasks, "queriesChatGPT:",queriesChatGPT)
         if  len(chatGPTtasks) > 0 and task1 != chatGPTtasks[0]:
             print("task1: ", task1)
             print("chatGPTtasks+tasks[1:]: ", chatGPTtasks+tasks[1:])
@@ -472,12 +485,14 @@ def seek_plan(theStack,skipHALT,state,tasks,plan,depth,verbose):
             if chatGPTtasks[-1] != verify_task:
                 chatGPTtasks.append(verify_task)
 
-            solution = seek_plan(theStack,skipHALT,state,chatGPTtasks+tasks[1:],plan,depth+1,verbose)
-            if solution != False:
-                return solution
+            solution  = seek_plan( theStack,skipHALT,state,chatGPTtasks+tasks[1:],plan,depth+1,verbose)
+            if solution == False:
+                print("no solution from chatGPT fix")
+            return solution 
 
-        print("no solution from chatGPT fix")
+        if verbose>2: print('depth {} returns failure'.format(depth))
+        return False
+        
     ### NEW code ends
     
-    if verbose>2: print('depth {} returns failure'.format(depth))
-    return False
+   

@@ -25,7 +25,7 @@ state1.at = {
 
 state1.cities = {'city1', 'city2'}
 state1.airports =  {'airport1', 'airport2'}
-state1.airplanes = {'plane1'}  
+state1.airplanes = {'plane1'}  ##
 state1.trucks = {'truck1','truck2'}
 state1.packages = {'package1'}
 state1.postOffices = {'location1', 'location2','location3'}
@@ -46,10 +46,10 @@ print('')
 pyhop.print_operators()
 
 
-pyhop.declare_methods('truckTransport', truckTransportMethod1, truckTransportMethod2, truckTransportMethod3) ## YES YES YES 0methods: YES
-pyhop.declare_methods('airplaneTransport', airplaneTransportMethod1, airplaneTransportMethod2, airplaneTransportMethod3) # YES YES YES 0methods: YES
-pyhop.declare_methods('transferPackage', transferPackageMethod1, transferPackageMethod2) # YES NO 0methods: NO
-#Unsolvale problem: remove all occurings of 'plane1' in the state #### NO
+pyhop.declare_methods('truckTransport',   truckTransportMethod1,  truckTransportMethod2, truckTransportMethod3) ## YES: (0) YES: (2) YES: (5,2)  0methods: YES (5,2); 
+pyhop.declare_methods('airplaneTransport',  airplaneTransportMethod1, airplaneTransportMethod2, airplaneTransportMethod3) # YES: (0) YES: (1) YES: (1) 0methods: YES: (1)
+pyhop.declare_methods('transferPackage', transferPackageMethod1, transferPackageMethod2) # YES: (0) YES: (1,1,1,1,1) 0methods: YES: (1,1,1,1)
+#Unsolvale problem: remove all occurings of 'plane1' in the state #### NO:(4)
 
 
 
@@ -91,8 +91,10 @@ Call pyhop.pyhop(state1,state.task1) with different verbosity levels
 
 
 print('- If verbose=2, Pyhop also prints a note at each recursive call:')
-print('- added flag to skip input commands: skipHALT if True it will  skip input comands' )
-pyhop.pyhop(True, state1,[('transferPackage','package1','location1','location3')],verbose=2)
+print('- added flag to skip input commands: skipHALT if True it will  skip input comands' ) ## this is the first argument below
+solution = pyhop.pyhop(True, state1,[('transferPackage','package1','location1','location3')],verbose=2)
+
+print(solution)
 
 # print('- If verbose=3, Pyhop also prints the intermediate states:')
 # pyhop.pyhop(state1,state1.task,verbose=3)

@@ -66,13 +66,13 @@ print('')
 pyhop.print_operators()
 
 
-pyhop.declare_methods('cleanHouse', cleanHouseM1, cleanHouseM2) #### YES YES 0methods: YES
-pyhop.declare_methods('organizeHouse', organizeHouseM1, organizeHouseM2)  #### YES YES 0methods: YES
-pyhop.declare_methods('sweepTask', sweepTaskM1,sweepTaskM2) #### YES YES 0methods: YES
-pyhop.declare_methods('organizeTask', organizeTaskM1,organizeTaskM2) #### YES YES 0methods: YES
-pyhop.declare_methods('takeCareHouse', takeCareHouseM1) #### NO 0methods: NO
+pyhop.declare_methods('cleanHouse',cleanHouseM1, cleanHouseM2) #### YES:(1) YES: (1) 0methods: YES:(1)
+pyhop.declare_methods('organizeHouse', organizeHouseM1, organizeHouseM2)  #### YES:(1) YES:(1) 0methods: YES:(1)
+pyhop.declare_methods('sweepTask', sweepTaskM1,sweepTaskM2) #### YES:(0) YES:(1) 0methods: YES:(1)
+pyhop.declare_methods('organizeTask', organizeTaskM1,organizeTaskM2) #### YES:(1) YES:(2) 0methods: YES:(2)
+pyhop.declare_methods('takeCareHouse', takeCareHouseM1) #### YES:(1) 0methods: YES:(1)
 
-## No solution: remove all occurings of 'robot' in the state ##### NO
+## No solution: remove all occurings of 'robot' in the state ##### NO:(3)
 
 
 print('')

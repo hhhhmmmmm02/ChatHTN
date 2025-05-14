@@ -8,7 +8,7 @@
 
 from openai import OpenAI
 openai = OpenAI(
-    api_key = "YOUR KEY"
+    api_key = "yourkey"
 )
 
 import re
@@ -33,16 +33,23 @@ def extract_named_predicates(api_response, names):
 
 ## extracts operators in pyhop form; removes the argument state (supposed to be first argument). (credit: ChatGPT)
 
-def newExtractOperators(response: str):
-    predicates = []
-    for line in response.strip().split("\n"):
-        line = line.strip()
-        if line:
-            func_name, args = line.split("(", 1)
-            args = args.rstrip(")")
-            args_list = [arg.strip().strip("'") for arg in args.split(",")]
-            predicates.append((func_name,) + tuple(args_list[1:]))  # Remove 'state'
-    return predicates
+import re
+
+def newExtractOperators(input_str):
+    result = []
+    lines = input_str.strip().splitlines()
+    for line in lines:
+        if not line:
+            continue
+        match = re.match(r'(\w+)\((.*)\)', line.strip())
+        if not match:
+            continue
+        func_name, args_str = match.groups()
+        # Split arguments, strip quotes and whitespace, and filter out 'state'
+        args = [arg.strip().strip("'\"") for arg in args_str.split(',')]
+        args = [arg for arg in args if arg.lower() != 'state']
+        result.append((func_name, *args))
+    return result
 
 ### converting the predicates into the pyhop task list format. (credit: ChatGPT)
 
@@ -115,13 +122,14 @@ def askChatWhichOperators(chatGPTtext, task, precs, effs, state, operatorsText, 
         ". I also gave you the following python functions which are called to check some preconditions and to check some effects: " +axiomsText+
         ". As a follow-up, can you map  the subtasks you generated with the operators I provided, please? please list the operator names as predicates,"+
         " for the match you generate use only the predicate names of the operators and the arguments in your sub-task breakdown"+
-        "Always respond with a compact, machine-readable format using predicate form. "+
-        "Avoid explanations or extra text unless explicitly requested. "+
-        "When generating your output, list only the predicates in the form: \n\n"+
-        "predicate(arg1, arg2, ...)\n\n"+
-        "where predicate is name of an operator I provided"+
-        #"for predicate names use the  operator names exactly as written, including capitalization and formatting. "+
-        " Separate predicates by newlines. Do not include explanations, headings, or descriptions."}
+        " Always respond with a compact, machine-readable format using predicate form. "+
+        " Avoid explanations or extra text unless explicitly requested. "+
+        " When generating your output, list only the predicates in the form: \n\n"+
+        " predicate(arg1, arg2, ...)\n\n"+
+        " where predicate is name of an operator I provided"+
+        " Separate predicates by newlines. Do not include explanations, headings, or descriptions." +
+        " Use only the operator names I provided. Ensure that every predicate corresponds exactly"+
+        " to one of those operators and that all arguments match those in your sub-task breakdown"}
     ]
 
     response = openai.chat.completions.create(
@@ -129,15 +137,9 @@ def askChatWhichOperators(chatGPTtext, task, precs, effs, state, operatorsText, 
         messages = conversation,        
         max_tokens = 1000
     )
+    print(response.choices[0].finish_reason)
     return response.choices[0].message.content
 
-
-    response = openai.chat.completions.create(
-        model= "gpt-4-turbo",
-        messages = conversation,        
-        max_tokens = 1000
-    )
-    return response.choices[0].message.content
 
 def chat_with_gpt(task, precs, effs, stateText,operatorsText, axiomsText):
 
@@ -149,7 +151,10 @@ def chat_with_gpt(task, precs, effs, stateText,operatorsText, axiomsText):
         ". Provide the Sub-Tasks Breakdown for the following task: " + task  +
         ". Here are the preconditions of the task: " + precs +
           ". Here are the effects of the task: " + effs +
-        ". Here is the current state: " +stateText }
+        ". Here is the current state: " +stateText+ 
+        " Provide a complete and logically valid decomposition using the operators and functions provided."+
+        " Do not invent new operators. Your output should be a step-by-step list of sub-tasks in logical order,"+
+        " using arguments grounded in the current state." }
     ]
 
 # + "Always respond with a compact, machine-readable format using S-expressions. "+
@@ -163,6 +168,7 @@ def chat_with_gpt(task, precs, effs, stateText,operatorsText, axiomsText):
         messages = conversation,        
         max_tokens = 1000
     )
+    print(response.choices[0].finish_reason)
     return response.choices[0].message.content
 
 """ goal = "Package picasso must be located in moma"
