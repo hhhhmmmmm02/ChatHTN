@@ -4,6 +4,11 @@ Combining HTN planning with ChatGPT (LLM)
 ChatHTN: author Hector Munoz-Avila
     This code is built on top of pyhop and therefore it is released under the  Apache License, Version 2.0 
 
+Publication:
+
+Hector Munoz-Avila, David W. Aha, Paola Rizzo (2025) ChatHTN: Interleaving Approximate (LLM) and Symbolic HTN Planning. 2nd International Conference on Neuro-symbolic Systems (NeuS)
+
+
 
 
 compilation order: DOMAINDefinitions, pyhop, openAINewVersion, DOMAIN
